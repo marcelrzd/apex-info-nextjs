@@ -37,7 +37,7 @@ export default function Header() {
               <NavigationMenuTrigger>Rotation</NavigationMenuTrigger>
               <NavigationMenuContent>
                 <ul className="flex flex-col gap-3 p-4 w-[280px] lg:grid-cols-[.75fr_1fr]">
-                  <ListItem href="/rotation/map" title="Crafting">
+                  <ListItem href="/rotation/crafting" title="Crafting">
                     Current crafting rotation items for the week.
                   </ListItem>
                   <ListItem href="/rotation/map" title="Maps">
