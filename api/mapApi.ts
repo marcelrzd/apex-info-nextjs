@@ -1,7 +1,10 @@
-export async function fetchNews() {
+export async function fetchMap() {
   try {
     const res = await fetch(
-      `${process.env.NEXT_PUBLIC_API_BASE_URL}/news?auth=${process.env.NEXT_PUBLIC_API_KEY}&lang=en-US`
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/maprotation?version=2&auth=${process.env.NEXT_PUBLIC_API_KEY}&lang=en-US`,
+      {
+        cache: "no-store",
+      }
     );
     if (!res.ok) {
       // If the server responded with a non-200 status, throw an error
@@ -10,9 +13,7 @@ export async function fetchNews() {
 
     const data = await res.json();
 
-    const newsItems = data.slice(0, 5); // Take only the first 5 items
-
-    return newsItems;
+    return data;
   } catch (error) {
     console.error("Error fetching data:", error.message);
     // Return an error object or null depending on how you want to handle errors

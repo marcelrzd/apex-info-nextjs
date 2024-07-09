@@ -17,7 +17,7 @@ import {
 
 export default function Header() {
   return (
-    <header className="header uppercase flex items-center justify-between p-8 w-full">
+    <header className="header container uppercase flex items-center justify-between p-8 w-full">
       <h1 className="text-3xl font-bold">
         <Link href="/" legacyBehavior passHref>
           Apex Info
