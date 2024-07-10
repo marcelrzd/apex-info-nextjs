@@ -1,19 +1,73 @@
+"use client";
+
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
   CardDescription,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
-
 import Image from "next/image";
 
-export default function MapCard({ mode }: { mode: any }) {
-  console.log(mode.next);
-  // format dates
+interface ModeItem {
+  start: number;
+  end: number;
+  readableDate_start: string;
+  readableDate_end: string;
+  map: string;
+  code: string;
+  DurationInSecs: number;
+  DurationInMinutes: number;
+  asset: string;
+  remainingSecs: number;
+  remainingMins: number;
+  remainingTimer: string;
+  eventName?: string;
+}
+
+interface MapCardProps {
+  mode: {
+    current: ModeItem;
+    next: ModeItem;
+  };
+}
+
+export default function MapCard({ mode }: MapCardProps) {
+  //   console.log(mode);
+  const [lastUpdated, setLastUpdated] = useState(new Date().toLocaleString());
+  // Timer state
+  const [timeLeft, setTimeLeft] = useState(mode.current.remainingTimer);
+
+  useEffect(() => {
+    const [initialHours, initialMinutes, initialSeconds] = timeLeft
+      .split(":")
+      .map(Number);
+    let totalSeconds =
+      initialHours * 3600 + initialMinutes * 60 + initialSeconds;
+
+    const timerId = setInterval(() => {
+      totalSeconds -= 1;
+
+      const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+      const minutes = String(Math.floor((totalSeconds % 3600) / 60)).padStart(
+        2,
+        "0"
+      );
+      const seconds = String(totalSeconds % 60).padStart(2, "0");
+
+      setTimeLeft(`${hours}:${minutes}:${seconds}`);
+
+      if (totalSeconds <= 0) {
+        clearInterval(timerId);
+      }
+    }, 1000);
+
+    return () => clearInterval(timerId);
+  }, [timeLeft]);
+
+  // Format dates
   const formatDate = (date: Date) => {
-    const formattedDate = date.toLocaleString(undefined, {
+    return date.toLocaleString(undefined, {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
@@ -22,13 +76,11 @@ export default function MapCard({ mode }: { mode: any }) {
       second: "2-digit",
       hour12: false,
     });
-    return formattedDate;
   };
-  const startDate = formatDate(new Date(mode.current.readableDate_start));
-  const endDate = formatDate(new Date(mode.current.readableDate_end));
+
   return (
-    <Card className="w-full shadow-md p-4">
-      <CardContent>
+    <Card className="w-full shadow-md p-4 max-h-[70vh]">
+      <CardContent className="h-auto">
         <CardDescription>
           <div className="flex flex-col w-full">
             <div className="flex justify-between">
@@ -37,30 +89,32 @@ export default function MapCard({ mode }: { mode: any }) {
                 {mode.current.map}
               </h1>
               <h1 className="text-3xl font-bold pb-4">
-                <span className="text-primary">Mode: </span>Battle Royale
+                <span className="text-primary">Next:</span> {mode.next.map}
               </h1>
             </div>
             <div className="flex justify-between">
+              {mode.current.eventName && (
+                <h1 className="text-xl font-bold">
+                  <span className="text-primary">Mode: </span>{" "}
+                  {mode.current.eventName}
+                </h1>
+              )}
               <h1 className="text-xl font-bold">
                 <span className="text-primary">Start time:</span>{" "}
-                {startDate.toLocaleString()}
+                {formatDate(new Date(mode.current.readableDate_start))}
               </h1>
               <h1 className="text-xl font-bold">
                 <span className="text-primary">End time:</span>{" "}
-                {endDate.toLocaleString()}
+                {formatDate(new Date(mode.current.readableDate_end))}
               </h1>
               <h1 className="text-xl font-bold">
-                <span className="text-primary">Remaining time:</span>{" "}
-                {mode.current.remainingTimer}
-              </h1>
-              <h1 className="text-xl font-bold">
-                <span className="text-primary">Next:</span> {mode.next.map}
+                <span className="text-primary">Remaining time:</span> {timeLeft}
               </h1>
             </div>
           </div>
           <div className="pt-4">
             <Image
-              className="w-full rounded-md"
+              className="w-full object-cover rounded-md"
               src={mode.current.asset}
               width={1000}
               height={1000}
@@ -70,9 +124,7 @@ export default function MapCard({ mode }: { mode: any }) {
         </CardDescription>
       </CardContent>
       <CardFooter>
-        <span className="text-sm text-center">
-          Last updated: {new Date().toLocaleString()}
-        </span>
+        <span className="text-sm text-center">Last updated: {lastUpdated}</span>
       </CardFooter>
     </Card>
   );
